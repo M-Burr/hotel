@@ -9,7 +9,7 @@ module Hotel
       @reservation_id = @@last_id + 1
       @@last_id = @reservation_id
       @room_id = room_id # Hotel manager should assign room id, figure out later
-      @date_range = (DateChecker.new(start_date, end_date)).reservation_range
+      @date_range = (DateRange.new(start_date, end_date)).reservation_range
       @cost = 0
     end
     
@@ -19,7 +19,7 @@ module Hotel
     # end
     
     def cost 
-      reservation_cost = (@date_range.length - 1) * 200
+      reservation_cost = (@date_range.to_a.length - 1) * 200
       @cost = reservation_cost
     end
     

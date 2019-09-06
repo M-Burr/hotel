@@ -2,11 +2,7 @@ require_relative 'test_helper'
 
 describe "Reservation class" do 
   describe "Reservation instantiation" do 
-    before do 
-      # start_date = Date.parse("September 1, 2019")
-      # middle = Date.parse("September 2, 2019")
-      # end_date = Date.parse("September 3, 2019")
-      #date_range = [start_date, middle, end_date]      
+    before do   
       @autumn_trip = Hotel::Reservation.new(1, "September 1, 2019", "September 3, 2019")
     end
     
@@ -25,10 +21,13 @@ describe "Reservation class" do
     end
     
     it "contains a date range" do 
-      expect(@autumn_trip.date_range).must_be_kind_of Array
-      expect(@autumn_trip.date_range[0]).must_equal(Date.parse("September 1, 2019"))
-      expect(@autumn_trip.date_range[1]).must_equal(Date.parse("September 2, 2019"))
-      expect(@autumn_trip.date_range[2]).must_equal(Date.parse("September 3, 2019"))
+      day1 = Date.parse("September 1, 2019")
+      day2 = Date.parse("September 2, 2019")
+      day3 = Date.parse("September 3, 2019")
+      expect(@autumn_trip.date_range).must_be_kind_of Range
+      expect(@autumn_trip.date_range.include?(day1)).must_equal true
+      expect(@autumn_trip.date_range.include?(day2)).must_equal true
+      expect(@autumn_trip.date_range.include?(day3)).must_equal true
     end
     
     it "contains a cost" do 

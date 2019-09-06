@@ -23,7 +23,7 @@ module Hotel
       #organize rooms by reservations 
       #iterate through all rooms to find openings
       #return room numbers available for that date
-      desired_dates = DateChecker.new(start_date, end_date).reservation_range
+      desired_dates = DateRange.new(start_date, end_date).reservation_range
       rooms_and_reservations = {}
       
       #creates a new hash to use for this method only
@@ -43,7 +43,7 @@ module Hotel
     end
     
     def make_reservation(start_date, end_date)
-      date_range = (DateChecker.new(start_date, end_date)).reservation_range
+      date_range = (DateRange.new(start_date, end_date)).reservation_range
       new_reservation = Reservation.new(1, start_date, end_date)
       @all_reservations.push(new_reservation)
       #call on check_availability helper method before confirming. only book if true
