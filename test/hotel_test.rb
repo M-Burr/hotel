@@ -23,9 +23,9 @@ describe "Hotel class" do
   describe "Hotel makes new reservations" do 
     before do 
       @hotel = Hotel::Hotel.new(5)
-      @hotel.make_reservation("October 5, 2019", "October 10, 2019")
-      @hotel.make_reservation("October 12, 2019", "October 15, 2019")
-      @hotel.make_reservation("December 1, 2020", "December 25, 2020")
+      @hotel.make_reservation(1, "October 5, 2019", "October 10, 2019")
+      @hotel.make_reservation(1, "October 12, 2019", "October 15, 2019")
+      @hotel.make_reservation(1, "December 1, 2020", "December 25, 2020")
     end
     
     it "updates total reservations for the hotel" do 
@@ -39,25 +39,35 @@ describe "Hotel class" do
   
   describe "Hotel searches for reservations by date and date range" do 
     before do 
-      @hotel = Hotel::Hotel.new(3)
-      @hotel.make_reservation("October 5, 2019", "October 10, 2019")
-      @hotel.make_reservation("October 12, 2019", "October 15, 2019")
-      @hotel.make_reservation("December 1, 2020", "December 25, 2020")
+      @hotel = Hotel::Hotel.new(1)
+      @hotel.make_reservation(1, "October 5, 2019", "October 10, 2019")
+      @hotel.make_reservation(1, "October 12, 2019", "October 15, 2019")
+      @hotel.make_reservation(1, "November 15, 2019", "November 25, 2019")
+      @hotel.make_reservation(1, "December 1, 2019", "December 25, 2019")
     end
     
-    it "looks up reservations by date" do 
-      result = @hotel.find_by_date("October 5, 2019")
-      expect(result).must_be_kind_of Array
-      expect(result.all?{ |reservation| reservation.class == Hotel::Reservation }).must_equal true
-      # make sure to exclude checkout date from list
+    it "checks availability by date range" do 
+      expect(@hotel.check_availability("August 12", "August 15")).wont_be_nil #available
+      expect(@hotel.check_availability("May 3, 2021", "May 5, 2021")).wont_be_nil # available
+      expect(@hotel.check_availability("December 25, 2019", "December 27, 2019")).wont_be_nil #for edge case like check out on check in day
+      expect(@hotel.check_availability("December 3, 2019", "December 5, 2019")).must_be_nil # unavailable
+      expect(@hotel.check_availability("September 30, 2019", "October 7, 2019")).must_be_nil # unavailable
+      expect(@hotel.check_availability("October 5, 2019", "October 10, 2019")).must_be_nil # unavailable
+      expect(@hotel.check_availability("October 5, 2019", "October 11, 2019")).must_be_nil # unavailable
+      expect(@hotel.check_availability("November 30, 2019", "December 26. 2019")).must_be_nil # unavailable
     end
     
-    it "looks up resverations by date range" do 
-      expect(@hotel.check_availability("May 3, 2021", "May 5, 2021")).must_equal true # no overlap
-      expect(@hotel.check_availability("October 10, 2019", "October 15, 2019")).must_equal true #for edge case like check out on check in day
-      expect(@hotel.check_availability("December 3, 2020", "December 5, 2019")).must_equal false # for overlap case 
+    it " returns a room number if available" do 
+      @bigger_hotel = Hotel::Hotel.new(2)
+      @bigger_hotel.make_reservation(1, "October 5, 2019", "October 10, 2019")
+      @bigger_hotel.make_reservation(1, "November 1, 2019", "November 5, 2019")
+      @bigger_hotel.make_reservation(2, "October 3, 2019", "October 15, 2019")
+      
+      expect(@bigger_hotel.check_availability("March 3, 2020", "March 7, 2020")).must_equal 1
+      expect(@bigger_hotel.check_availability("November 4, 2019", "November 8, 2019")).must_equal 2 
+      expect(@bigger_hotel.check_availability("October 12, 2019", "October 17, 2019")).must_equal 1 
+      expect(@bigger_hotel.check_availability("October 14, 2019", "November 3, 2019")).must_be_nil
     end
     
   end
-  
 end

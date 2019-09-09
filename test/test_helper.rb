@@ -4,6 +4,7 @@ SimpleCov.start do
 end
 
 require 'date'
+require 'time'
 require "minitest"
 require "minitest/autorun"
 require "minitest/reporters"

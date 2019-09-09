@@ -1,3 +1,4 @@
+#require 'pry'
 module Hotel
   class Hotel
     attr_reader :all_rooms, :all_reservations
@@ -19,43 +20,63 @@ module Hotel
     end
     
     def check_availability(start_date, end_date)
-      #checks @all reservations to make sure no overlap
-      #organize rooms by reservations 
-      #iterate through all rooms to find openings
-      #return room numbers available for that date
       desired_dates = DateRange.new(start_date, end_date).reservation_range
-      rooms_and_reservations = {}
       
-      #creates a new hash to use for this method only
-      @all_reservations.each do |reservation|
-        rooms_and_reservations["Room #{reservation.room_id}"] = reservation.date_range
+      rooms_and_reservations = {}
+      num_rooms = @all_rooms.length
+      num_rooms.times do |i|
+        rooms_and_reservations[i + 1] = []
       end
       
-      # iterates over rooms & reservations to find if the desired dates conflict
-      # if it conflicts, return error message
-      # if it does not cinflict say it is available/return true
+      @all_reservations.each do |reservation|
+        rooms_and_reservations[reservation.room_id].push(reservation)
+      end      
       
+      value = nil
       rooms_and_reservations.each do |room, calendar|
-        calendar.each do |reservations|
-          
+        room_num = room if room_available?(calendar, desired_dates) 
+        value = value || room_num
+      end
+      return value
+    end
+    
+    
+    def make_reservation(room_id, start_date, end_date)
+      date_range = (DateRange.new(start_date, end_date)).reservation_range
+      new_reservation = Reservation.new(room_id, start_date, end_date)
+      @all_reservations.push(new_reservation) # each range is an item in the array
+    end
+    
+    private 
+    def room_available?(calendar, desired_dates)
+      room_available = true
+      calendar.each do |booked_reservations|
+        # Case 1.
+        if desired_dates.end <= booked_reservations.date_range.begin
+          # available
+          room_available = room_available && true
+          # Case 2.
+        elsif desired_dates.begin < booked_reservations.date_range.begin && desired_dates.end < booked_reservations.date_range.end
+          # Unavailable
+          room_available = room_available && false
+          # Case 3.
+        elsif desired_dates.begin >= booked_reservations.date_range.begin && desired_dates.begin < booked_reservations.date_range.end && desired_dates.end < booked_reservations.date_range.end
+          # Unavailable
+          room_available = room_available && false
+          # Case 4.
+        elsif desired_dates.begin >= booked_reservations.date_range.begin && desired_dates.begin < booked_reservations.date_range.end && desired_dates.end >= booked_reservations.date_range.end
+          # Unavailable
+          room_available = room_available && false 
+          # Case 5.
+        elsif desired_dates.begin >= booked_reservations.date_range.end
+          # available
+          room_available = room_available && true
+        else 
+          room_available = room_available && false
         end
       end
+      return room_available
     end
-    
-    def make_reservation(start_date, end_date)
-      date_range = (DateRange.new(start_date, end_date)).reservation_range
-      new_reservation = Reservation.new(1, start_date, end_date)
-      @all_reservations.push(new_reservation)
-      #call on check_availability helper method before confirming. only book if true
-    end
-    
-    # def available?(start_date, end_date)
-    #   #this will be a helper method to be used inside make_reservation
-    #   #if it returns true, will allow new reservations
-    #   start_date = Date.parse(start_date)
-    #   end_date = Date.parse(end_date)
-    #   date_range 
-    # end
     
   end
 end
