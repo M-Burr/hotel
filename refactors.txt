@@ -1,0 +1,6 @@
+Changes to consider when refactoring:
+  - clearer variable names
+  - create more classes so that the hotel class isn't doing so much
+      - perhaps move checking availability to the reservation class or daterange class?
+  - don't allow user to pass in a room_id; assign one to the reservation based on checking availability
+  - try to decouple code as much as possible next time
