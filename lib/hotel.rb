@@ -3,7 +3,8 @@ module Hotel
   class Hotel
     attr_reader :all_rooms, :all_reservations
     
-    #call @all_rooms to list all of the rooms inside the hotel
+    # @all_rooms to list all of the rooms inside the hotel
+    # @all reservations keeps track of all reservations
     def initialize(num_of_rooms)
       @all_reservations = []
       @all_rooms = [] 

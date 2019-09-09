@@ -51,6 +51,12 @@ describe "Hotel class" do
       @hotel.make_reservation(1, "December 1, 2019", "December 25, 2019")
     end
     
+    it "returns all reservations for a given date" do 
+      expect(@hotel.find_by_date("October 5, 2019")).must_be_kind_of Array
+      expect(@hotel.find_by_date("October 5, 2019").all?{|reservation| reservation.class == Hotel::Reservation}).must_equal true
+      expect(@hotel.find_by_date("October 5, 2019").length).must_equal 1
+    end
+    
     it "checks availability by date range" do 
       expect(@hotel.check_availability("August 12", "August 15")).must_equal [1]#available
       expect(@hotel.check_availability("May 3, 2021", "May 5, 2021")).must_equal [1] # available
