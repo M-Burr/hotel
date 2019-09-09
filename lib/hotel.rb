@@ -15,13 +15,35 @@ module Hotel
     def find_by_date(date)
       date = Date.parse(date)
       @all_reservations.find_all{|reservation| reservation.date_range.include?(date)}
-      # should I do each instead & if date is last day of reservation, alert hotel that it
-      # is checkout day
     end
     
+    # lists available rooms given a date range
     def check_availability(start_date, end_date)
       desired_dates = DateRange.new(start_date, end_date).reservation_range
       
+      rooms = []
+      rooms_and_reservations.each do |room, calendar|
+        room_num = room if room_available?(calendar, desired_dates) 
+        rooms << room_num 
+      end
+      return rooms.compact
+    end
+    
+    def make_reservation(room_id, start_date, end_date)
+      date_range = (DateRange.new(start_date, end_date)).reservation_range
+      calendar = rooms_and_reservations[room_id]
+      
+      unless room_available?(calendar, date_range)
+        raise ArgumentError
+      end
+      
+      new_reservation = Reservation.new(room_id, start_date, end_date)
+      @all_reservations.push(new_reservation)
+    end
+    
+    private 
+    
+    def rooms_and_reservations
       rooms_and_reservations = {}
       num_rooms = @all_rooms.length
       num_rooms.times do |i|
@@ -32,22 +54,9 @@ module Hotel
         rooms_and_reservations[reservation.room_id].push(reservation)
       end      
       
-      value = nil
-      rooms_and_reservations.each do |room, calendar|
-        room_num = room if room_available?(calendar, desired_dates) 
-        value = value || room_num
-      end
-      return value
+      return rooms_and_reservations
     end
     
-    
-    def make_reservation(room_id, start_date, end_date)
-      date_range = (DateRange.new(start_date, end_date)).reservation_range
-      new_reservation = Reservation.new(room_id, start_date, end_date)
-      @all_reservations.push(new_reservation) # each range is an item in the array
-    end
-    
-    private 
     def room_available?(calendar, desired_dates)
       room_available = true
       calendar.each do |booked_reservations|
